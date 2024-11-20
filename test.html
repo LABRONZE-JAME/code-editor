@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Code Editor</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+        :root {
+            /* Base Colors */
+            --background-color: #121212; /* Very dark gray (almost black) for the page background */
+            --navbar-background: #1E1E1E; /* Dark gray for navbar background */
+            --navbar-text-color: #E0E0E0; /* Light gray text color for readability */
+            --card-background-color: #1C1C1C; /* Slightly lighter dark gray for cards */
+            --input-background-color: #333333; /* Dark gray for input fields */
+            --input-text-color: #FFFFFF; /* White text color for input fields */
+            
+            /* Button Colors */
+            --button-color: #444444; /* Medium gray for button background */
+            --button-hover-color: #666666; /* Lighter gray for button hover */
+            --button-active-color: #888888; /* Even lighter gray for button active state */
+            --button-text-color: #E0E0E0; /* Light gray text for buttons */
+            
+            /* Text and Border Colors */
+            --navbar-border-color: #333333; /* Dark border color for navbar */
+            --error-color: #FF5252; /* Red for error messages */
+            --success-color: #4CAF50; /* Green for success messages */
+            --warning-color: #FF9800; /* Orange for warning messages */
+            
+            /* Light Gray Tones */
+            --light-gray: #BDBDBD; /* Light gray for general text */
+            --white: #FFFFFF; /* Pure white for contrast */
+            --dark-gray: #212121; /* Darker gray for cards, sections, etc. */
+        }
+
+        .roboto-thin { font-family: "Roboto", sans-serif; font-weight: 100; font-style: normal; }
+        .roboto-light { font-family: "Roboto", sans-serif; font-weight: 300; font-style: normal; }
+        .roboto-regular { font-family: "Roboto", sans-serif; font-weight: 400; font-style: normal; }
+        .roboto-medium { font-family: "Roboto", sans-serif; font-weight: 500; font-style: normal; }
+        .roboto-bold { font-family: "Roboto", sans-serif; font-weight: 700; font-style: normal; }
+        .roboto-black { font-family: "Roboto", sans-serif; font-weight: 900; font-style: normal; }
+        .roboto-thin-italic { font-family: "Roboto", sans-serif; font-weight: 100; font-style: italic; }
+        .roboto-light-italic { font-family: "Roboto", sans-serif; font-weight: 300; font-style: italic; }
+        .roboto-regular-italic { font-family: "Roboto", sans-serif; font-weight: 400; font-style: italic; }
+        .roboto-medium-italic { font-family: "Roboto", sans-serif; font-weight: 500; font-style: italic; }
+        .roboto-bold-italic { font-family: "Roboto", sans-serif; font-weight: 700; font-style: italic; }
+        .roboto-black-italic { font-family: "Roboto", sans-serif; font-weight: 900; font-style: italic; }
+
+        body { overflow: hidden; color: var(--button-text-color); }
+        html body { margin: 0; padding: 0; background-color: var(--background-color); overflow-x: none; }
+        #tabGroup { width: 100%; height: 100%; }
+        nav { display: flex; justify-content: left; align-items: center; background-color: var(--navbar-background); width: 100vw; }
+        nav > a { padding: 2vh 15px; color: var(--navbar-text-color); background-color: var(--navbar-background); transition: background-color 0.4s ease-in-out; }
+        nav > a:hover { background-color: var(--navbar-border-color); }
+        .tab { display: none; height:95vh; width: 100vw; overflow: hidden; }
+        .codeTextbox { background-color: var(--input-background-color); color: var(--input-text-color);border-radius: 0; height: 94vh; width: 100%; padding: 0; border: 0; resize: none; }
+        .codeTextbox:focus { outline: 0; }
+        a { text-decoration: none; color: var(--button-text-color); }
+        a:disabled { pointer-events: none; }
+        .dropdownContent { display: none; position: absolute; background-color: #f1f1f1; min-width: 160px; overflow: auto; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; }
+        .dropdownBtn { color: black; padding: 12px 16px; text-decoration: none; display: block; }
+        .show { display: block; }
+        .newTabBtn { padding: 0.5rem 1.5rem; }
+        .newTabMenu { height: 30vh; width: 20vw; background-color: #444444; padding: 5vh 2.5vw; }
+        .newTabMenu ul { padding: 0; display: flex; justify-content: left; flex-direction: column; }
+        .nameTxt { justify-self: right; display: inline; }
+        .docTxt { justify-self: right; display: inline; }
+        .navLink { opacity: 1; }
+
+        #newTab { justify-content: center; align-items: center; }
+        #nameTxt { display: none; }
+    </style>
+</head>
+<body class="roboto-regular">
+    <nav>
+        <a class="navLink" href="#">Code Editor</a>
+        <a class="navLink navLinkTab" href="#" id="fileNavBtn" onclick="dropdown('file')">File</a>
+        <a class="navLink navLinkTab" href="#" id="editNavBtn" onclick="dropdown('edit')">Edit</a>
+        <a class="navLink navLinkTab" href="#" id="htmlNavBtn" onclick="tabName('HTML')">HTML</a>
+        <a class="navLink navLinkTab" href="#" id="cssNavBtn" onclick="tabName('CSS')">CSS</a>
+        <a class="navLink navLinkTab" href="#" id="jsNavBtn" onclick="tabName('JS')">JS</a>
+        <a class="navLink" href="#" id="helpNavBtn" onclick="tabName('Help')">Help</a>
+
+        <div id="HTMLTxt"><input class="nameTxt" type="text" placeholder="index" id="HTMLNameTxt"><p class="docTxt" id="HTMLDocExt">.html</p></div>
+        <div id="CSSTxt"><input class="nameTxt" type="text" placeholder="styles" id="CSSNameTxt"><p class="docTxt" id="CSSDocExt">.css</p></div>
+        <div id="JSTxt"><input class="nameTxt" type="text" placeholder="script" id="JSNameTxt"><p class="docTxt" id="JSDocExt">.js</p></div>
+        
+    </nav>
+    <div id="fileDropdown" class="dropdownContent">
+        <a class="dropdownBtn" href="#">Save</a>
+        <a class="dropdownBtn" href="#">Save As</a>
+        <a class="dropdownBtn" href="#">Export</a>
+    </div>
+    <div id="editDropdown" class="dropdownContent">
+        <a class="dropdownBtn" href="#">fave</a>
+        <a class="dropdownBtn" href="#">fave As</a>
+        <a class="dropdownBtn" href="#">fxport</a>
+    </div>
+    <div id="tabGroup">
+        <div class="tab" style="display: none;" id="newTab">
+            <div class="newTabMenu">
+                <h2>Code Editor</h2>
+                <ul>
+                    <a href="#" class="newTabBtn" onclick="tabName('HTML')">New File</a>
+                    <a href="#" class="newTabBtn" onclick="alert('WIP')">Open Folder</a>
+                </ul>
+            </div>
+        </div>
+        <div class="tab" style="display: none;" id="HTMLTab">
+            <textarea id="htmlTxt" class="codeTextbox" spellcheck="false" wrap="soft">for /l %i in (1,1,254) do @ping -n 1 -w 1 1"Reply"</textarea>
+        </div>
+        <div class="tab" style="display: none;" id="CSSTab">
+            <textarea id="cssTxt" class="codeTextbox" spellcheck="false" wrap="soft">for /l %i in (1,1,254) do @ping -n 1 -w 1 192.168.1.%eply"</textarea>
+        </div>
+        <div class="tab" style="display: none;" id="JSTab">
+            <textarea id="jsTxt" class="codeTextbox" spellcheck="false" wrap="soft">for /l %ing -n 1 -w 1 192.168.1.%i | find "Reply"</textarea>
+        </div>
+        <div class="tab" style="display: none;" id="HelpTab">
+            sdkfuhkjshdfj
+        </div>
+    </div>
+    
+    
+
+    <script>
+        const tabs = document.querySelectorAll('.tab');
+        const textareas = document.querySelectorAll('.codeTextbox');
+        const navLinkTabs = document.querySelectorAll('.navLinkTab');
+
+        document.getElementById("htmlTxt").value = atob("PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8bWV0YSBodHRwLWVxdWl2PSJYLVVBLUNvbXBhdGlibGUiIGNvbnRlbnQ9ImllPWVkZ2UiPgogICAgPHRpdGxlPkhUTUwgVGVtcGxhdGU8L3RpdGxlPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBDU1MgLS0+CiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9InN0eWxlcy5jc3MiPgoKPC9oZWFkPgo8Ym9keT4KCiAgICA8IS0tIENvbnRlbnQgZ29lcyBoZXJlIC0tPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBKYXZhU2NyaXB0IC0tPgogICAgPHNjcmlwdCBzcmM9InNjcmlwdC5qcyI+PC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPg==")
+
+        tabName('new')
+
+        function tabName(tabName) {
+            if (tabName == 'new') {
+                hideTabs()
+                document.getElementById("HTMLTxt").style.display = "none";
+                document.getElementById("CSSTxt").style.display = "none";
+                document.getElementById("JSTxt").style.display = "none";
+                navLinkTabs.forEach(function(link) { link.style.display = "none"; });
+                document.getElementById(tabName + "Tab").style.display = "flex";
+            } else {
+                hideTabs()
+                document.getElementById("HTMLTxt").style.display = "none";
+                document.getElementById("CSSTxt").style.display = "none";
+                document.getElementById("JSTxt").style.display = "none";
+                navLinkTabs.forEach(function(link) { link.style.display = "inline"; });
+                document.getElementById(tabName + "Txt").style.display = "inline";
+                document.getElementById(tabName + "Tab").style.display = "block";
+                chgTitle(tabName)
+            };
+        }
+
+        function hideTabs() {
+            tabs.forEach(function(tab) {
+                tab.style.display = 'none';
+            });
+        }
+
+        function chgTitle(titleName) {
+            if (titleName == undefined) {
+                document.title = "Code Editor";
+            } else {
+                document.title = titleName + " | Code Editor";
+            };
+        };
+
+        function createBlank() {
+            var code = compileDoc();
+            var win = window.open();
+            win.document.body.style.margin = '0';
+            win.document.body.style.height = '100vh';
+            var iframe = win.document.createElement('iframe');
+            iframe.style.border = 'none';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.margin = '0';
+            iframe.srcdoc = code;
+            win.document.body.appendChild(iframe);
+        }
+
+        function saveOneFile() {
+            const docName = HTMLNameTxt.value;
+            const docExt = "html";
+            const content = compileDoc()
+            const blob = new Blob([content]);
+            // const blob = new Blob([content], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = docName + '.' + docExt;
+            a.click();
+        };
+
+        function compileDoc() {
+            var compDoc = document.getElementById("htmlTxt").value;
+            var cssTxt = document.getElementById("cssTxt");
+            var jsTxt = document.getElementById("jsTxt");
+
+            compDoc = compDoc.replace('<link rel="stylesheet" href="' + document.getElementById("CSSNameTxt") + '.css">', "<style>" + cssTxt.value + "<\/style>")
+            compDoc = compDoc.replace('<script src="' + document.getElementById("JSNameTxt") + '.js"><\/script>', "<script>" + jsTxt.value + "<\/script>")
+            
+            return compDoc;
+        }
+
+        textareas.forEach(function(textarea) {
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key == 'Tab') {
+                e.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+
+                // set textarea value to: text before caret + tab + text after caret
+                this.value = this.value.substring(0, start) +
+                    "\t" + this.value.substring(end);
+
+                // put caret at right position again
+                this.selectionStart = this.selectionEnd = start + 1;
+                }
+            });
+        });
+
+        function dropdown(from) {
+            document.getElementById(from + "Dropdown").classList.toggle("show");
+        }
+        
+        // window.onclick = function(event) {
+        //     const dropdowns = ['file', 'edit']
+        //     for (let i = 0; i < dropdowns.length; i++) {
+        //         closeDropdown(dropdowns[i])
+        //     }
+        // }
+
+        // function closeDropdown(type) {
+        //     if (!event.target.matches('#' + type + 'NavBtn')) {
+        //         var dropdowns = document.getElementsByClassName("dropdownContent");
+        //         var i;
+        //         for (i = 0; i < dropdowns.length; i++) {
+        //             var openDropdown = dropdowns[i];
+        //             if (openDropdown.classList.contains('show')) {
+        //                 openDropdown.classList.remove('show');
+        //             }
+        //         }
+        //     }
+        // }
+
+        
+
+        // Function to auto-indent code in the textarea
+        function autoIndentTextarea(textarea) {
+            // Split the textarea value by new lines
+            let lines = textarea.value.split("\n");
+            
+            for (let i = 1; i < lines.length; i++) {
+            // Check if the previous line ends with a function declaration or block opening (e.g. function testFunc() {)
+            let prevLine = lines[i - 1].trim();
+            
+            // Basic checks for function-like declarations or block-opening lines
+            if (prevLine.endsWith("{") || prevLine.includes("function")) {
+                // Indent the current line by 4 spaces (or more if needed)
+                lines[i] = "    " + lines[i].trimStart();
+            }
+            // Optionally, you can also un-indent if a closing curly brace is found
+            else if (prevLine.endsWith("}")) {
+                // Remove indentation for lines after a closing brace
+                lines[i] = lines[i].trimStart();
+            }
+            }
+
+            // Join the lines back together
+            textarea.value = lines.join("\n");
+        }
+
+        // Loop through all textarea elements and add event listener for keydown
+        textareas.forEach(function(textarea) {
+            textarea.addEventListener('input', function() {
+            // Call the auto-indent function whenever the user types
+            autoIndentTextarea(textarea);
+            });
+        });
+
+    </script>
+</body>
+</html>
