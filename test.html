@@ -50,52 +50,89 @@
         html body { margin: 0; padding: 0; background-color: var(--background-color); overflow-x: none; }
         #tabGroup { width: 100%; height: 100%; }
         nav { display: flex; justify-content: left; align-items: center; background-color: var(--navbar-background); width: 100vw; }
-        nav > a { padding: 2vh 15px; color: var(--navbar-text-color); background-color: var(--navbar-background); transition: background-color 0.4s ease-in-out; }
-        nav > a:hover { background-color: var(--navbar-border-color); }
+        .navLink { padding: 2vh 15px; color: var(--navbar-text-color); background-color: var(--navbar-background); transition: background-color 0.4s ease-in-out; font-size: medium; }
+        .navLink:hover { background-color: var(--navbar-border-color); }
         .tab { display: none; height:95vh; width: 100vw; overflow: hidden; }
         .codeTextbox { background-color: var(--input-background-color); color: var(--input-text-color);border-radius: 0; height: 94vh; width: 100%; padding: 0; border: 0; resize: none; }
         .codeTextbox:focus { outline: 0; }
         a { text-decoration: none; color: var(--button-text-color); }
         a:disabled { pointer-events: none; }
-        .dropdownContent { display: none; position: absolute; background-color: #f1f1f1; min-width: 160px; overflow: auto; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; }
-        .dropdownBtn { color: black; padding: 12px 16px; text-decoration: none; display: block; }
+        .dropdownContent { display: none; position: absolute; background-color: var(--button-color); min-width: 160px; overflow: auto; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; }
+        .cmdDropdownBtn { text-align: right; display: inline; margin-left: 1rem; color: var(--button-active-color); right: 15px; position: absolute; margin: 0; }
+        .dropdownBtn:hover > .cmdDropdownBtn { color: var(--button-color); }
+        .dropdownBtn:hover { background-color: var(--button-hover-color); transition: color 0.4s ease-in-out; }
+        .dropdownBtn { color: var(--navbar-text-color); padding: 12px 16px; text-decoration: none; display: block; transition: background-color 0.4s ease-in-out; padding-right: 100px; }
+        .dropdown { opacity: 1; }
         .show { display: block; }
+        .hide { display: none !important; }
         .newTabBtn { padding: 0.5rem 1.5rem; }
         .newTabMenu { height: 30vh; width: 20vw; background-color: #444444; padding: 5vh 2.5vw; }
         .newTabMenu ul { padding: 0; display: flex; justify-content: left; flex-direction: column; }
-        .nameTxt { justify-self: right; display: inline; }
-        .docTxt { justify-self: right; display: inline; }
-        .navLink { opacity: 1; }
+        .nameTxt { justify-self: right; display: inline;  background-color: var(--navbar-background); color: var(--navbar-text-color); border: none;  font-size: medium; text-align: right; }
+        .nameTxt:focus { outline: 0; }
+        .docTxt { justify-self: right; display: inline;  margin-left: -5px; }
+        .perTxtNavStuff { right: 0; position: absolute; }
 
         #newTab { justify-content: center; align-items: center; }
         #nameTxt { display: none; }
+
+        .modal { position: fixed; z-index: 2; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); padding-top: 60px; display: block; }
+        .modal-content { background-color: white; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 300px; }
+        .modal-content > .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .modal-content > .close:hover,
+        .modal-content > .close:focus { color: black; text-decoration: none; cursor: pointer; }
+        .modal-content > input { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }
+        .modal-content > button { padding: 8px 16px; margin-top: 10px; cursor: pointer; }
+        .modal-content > label { display: block; margin-top: 10px; }
     </style>
 </head>
 <body class="roboto-regular">
     <nav>
         <a class="navLink" href="#">Code Editor</a>
-        <a class="navLink navLinkTab" href="#" id="fileNavBtn" onclick="dropdown('file')">File</a>
-        <a class="navLink navLinkTab" href="#" id="editNavBtn" onclick="dropdown('edit')">Edit</a>
+        <div class="dropdown">
+            <a class="navLink navLinkTab" href="#" id="fileNavBtn" onclick="dropdown('file')">File</a>
+            <div id="fileDropdown" class="dropdownContent">
+                <a class="dropdownBtn" href="#" onclick="openFiles()">Open Files <p class="cmdDropdownBtn">Ctrl + O</p></a>
+                <a class="dropdownBtn" href="#" onclick="saveFiles()">Save <p class="cmdDropdownBtn">Ctrl + S</p></a>
+                <a class="dropdownBtn" href="#" onclick="saveFilesAs()">Save As <p class="cmdDropdownBtn">Ctrl + Shift + S</p></a>
+                <a class="dropdownBtn" href="#" onclick="createBlank()">Open in New Tab <p class="cmdDropdownBtn">Ctrl + D</p></a>
+                <a class="dropdownBtn" href="#" onclick="saveToFile()">Save (One File)</a>
+                <a class="dropdownBtn" href="#" onclick="saveFileAs()">Save As (One File)</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a class="navLink navLinkTab" href="#" id="editNavBtn" onclick="dropdown('edit')">Edit</a>
+            <div id="editDropdown" class="dropdownContent">
+                <a class="dropdownBtn" href="#" onclick="cutText()">Cut <p class="cmdDropdownBtn">Ctrl + X</p></a>
+                <a class="dropdownBtn" href="#" onclick="copyText()">Copy <p class="cmdDropdownBtn">Ctrl + C</p></a>
+                <a class="dropdownBtn" href="#" onclick="pasteText()">Paste <p class="cmdDropdownBtn">Ctrl + P</p></a>
+                <a class="dropdownBtn" href="#" onclick="toggleModal()">Find and Replace <p class="cmdDropdownBtn">Ctrl + F</p></a>
+            </div>
+        </div>
         <a class="navLink navLinkTab" href="#" id="htmlNavBtn" onclick="tabName('HTML')">HTML</a>
         <a class="navLink navLinkTab" href="#" id="cssNavBtn" onclick="tabName('CSS')">CSS</a>
         <a class="navLink navLinkTab" href="#" id="jsNavBtn" onclick="tabName('JS')">JS</a>
         <a class="navLink" href="#" id="helpNavBtn" onclick="tabName('Help')">Help</a>
 
-        <div id="HTMLTxt"><input class="nameTxt" type="text" placeholder="index" id="HTMLNameTxt"><p class="docTxt" id="HTMLDocExt">.html</p><input id="HTMLFileUp" type="file"></div>
-        <div id="CSSTxt"><input class="nameTxt" type="text" placeholder="styles" id="CSSNameTxt"><p class="docTxt" id="CSSDocExt">.css</p><input id="CSSFileUp" type="file"></div>
-        <div id="JSTxt"><input class="nameTxt" type="text" placeholder="script" id="JSNameTxt"><p class="docTxt" id="JSDocExt">.js</p><input id="JSFileUp" type="file"></div>
+        <div class="perTxtNavStuff" id="HTMLTxt">
+            <input class="nameTxt" type="text" placeholder="index" id="HTMLNameTxt">
+            <p class="docTxt" id="HTMLDocExt">.html</p>
+            <a class="navLink" onclick="openFile('html')" href="#">Open .html</a>
+        </div>
+        <div class="perTxtNavStuff" id="CSSTxt">
+            <input class="nameTxt" type="text" placeholder="styles" id="CSSNameTxt">
+            <p class="docTxt" id="CSSDocExt">.css</p>
+            <a class="navLink" onclick="openFile('css')" href="#">Open .css</a>
+        </div>
+        <div class="perTxtNavStuff" id="JSTxt">
+            <input class="nameTxt" type="text" placeholder="script" id="JSNameTxt">
+            <p class="docTxt" id="JSDocExt">.js</p>
+            <a class="navLink" onclick="openFile('js')" href="#">Open .js</a>
+        </div>
         
     </nav>
-    <div id="fileDropdown" class="dropdownContent">
-        <a class="dropdownBtn" href="#">Save</a>
-        <a class="dropdownBtn" href="#">Save As</a>
-        <a class="dropdownBtn" href="#">Export</a>
-    </div>
-    <div id="editDropdown" class="dropdownContent">
-        <a class="dropdownBtn" href="#">fave</a>
-        <a class="dropdownBtn" href="#">fave As</a>
-        <a class="dropdownBtn" href="#">fxport</a>
-    </div>
+    
+    
     <div id="tabGroup">
         <div class="tab" style="display: none;" id="newTab">
             <div class="newTabMenu">
@@ -119,19 +156,42 @@
             sdkfuhkjshdfj
         </div>
     </div>
+
+    <div id="farModal" class="modal hide">
+        <div class="modal-content">
+          <span class="close" onclick="toggleModal()">&times;</span>
+          <h4>Find and Replace</h4>
     
+          <label for="find-input">Find:</label>
+          <input type="text" id="find-input" placeholder="Text to find">
+          
+          <label for="replace-input">Replace with:</label>
+          <input type="text" id="replace-input" placeholder="Replacement text">
     
+          <label for="case-sensitivity">Case Sensitive:</label>
+          <input type="checkbox" id="case-sensitivity">
+    
+          <button onclick="findAndReplace()">Replace</button>
+        </div>
+    </div>
 
     <script>
         const tabs = document.querySelectorAll('.tab');
         const textareas = document.querySelectorAll('.codeTextbox');
         const navLinkTabs = document.querySelectorAll('.navLinkTab');
 
+        let currentTab = 'new';
+
         document.getElementById("htmlTxt").value = atob("PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8bWV0YSBodHRwLWVxdWl2PSJYLVVBLUNvbXBhdGlibGUiIGNvbnRlbnQ9ImllPWVkZ2UiPgogICAgPHRpdGxlPkhUTUwgVGVtcGxhdGU8L3RpdGxlPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBDU1MgLS0+CiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9InN0eWxlcy5jc3MiPgoKPC9oZWFkPgo8Ym9keT4KCiAgICA8IS0tIENvbnRlbnQgZ29lcyBoZXJlIC0tPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBKYXZhU2NyaXB0IC0tPgogICAgPHNjcmlwdCBzcmM9InNjcmlwdC5qcyI+PC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPg==")
+        document.getElementById("HTMLNameTxt").value = "index";
+        document.getElementById("CSSNameTxt").value = "styles";
+        document.getElementById("JSNameTxt").value = "script";
 
         tabName('new')
 
         function tabName(tabName) {
+            currentTab = tabName;
+
             if (tabName == 'new') {
                 hideTabs()
                 document.getElementById("HTMLTxt").style.display = "none";
@@ -180,15 +240,14 @@
         }
 
         function saveOneFile() {
-            const docName = HTMLNameTxt.value;
-            const docExt = "html";
+            const docName = document.getElementById('HTMLNameTxt').value;
             const content = compileDoc()
             const blob = new Blob([content]);
             // const blob = new Blob([content], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = docName + '.' + docExt;
+            a.download = docName + '.html';
             a.click();
         };
 
@@ -197,8 +256,10 @@
             var cssTxt = document.getElementById("cssTxt");
             var jsTxt = document.getElementById("jsTxt");
 
-            compDoc = compDoc.replace('<link rel="stylesheet" href="' + document.getElementById("CSSNameTxt") + '.css">', "<style>" + cssTxt.value + "<\/style>")
-            compDoc = compDoc.replace('<script src="' + document.getElementById("JSNameTxt") + '.js"><\/script>', "<script>" + jsTxt.value + "<\/script>")
+            compDoc = compDoc.replace('<link rel="stylesheet" href="' + document.getElementById("CSSNameTxt").value + '.css">', "<style>" + cssTxt.value + "<\/style>");
+            compDoc = compDoc.replace(atob("PHNjcmlwdCBzcmM9Ig==") + document.getElementById("JSNameTxt").value + atob("LmpzIj48L3NjcmlwdD4="), "<script>" + jsTxt.value + "<\/script>");
+            compDoc = compDoc.replace('&lt;link rel="stylesheet" href="' + document.getElementById("CSSNameTxt").value + '.css"&gt;', "<style>" + cssTxt.value + "<\/style>");
+            compDoc = compDoc.replace('&lt;script src="' + document.getElementById("JSNameTxt").value + '.js"&gt;&lt;/script&gt;', "<script>" + jsTxt.value + "<\/script>");
             
             return compDoc;
         }
@@ -222,14 +283,56 @@
 
         function dropdown(from) {
             document.getElementById(from + "Dropdown").classList.toggle("show");
+
+            var d = document.getElementById(from + "Dropdown");
+            let x_pos = event.ClientX
+            let y_pos = event.ClientY
+            d.style.position = "absolute";
+            d.style.left = x_pos+'px';
+            d.style.top = y_pos+'px';
+        }
+
+        // Toggle the modal visibility by toggling the "hide" class
+        function toggleModal() {
+            const modal = document.getElementById('farModal');
+            modal.classList.toggle('hide');  // Toggle the hide class
+        }
+
+        // Find and Replace function with Case Sensitivity Toggle
+        function findAndReplace() {
+            const textarea = document.getElementById('htmlTxt');
+            if (tabName == 'HTML') { textarea = document.getElementById('htmlTxt'); }
+            if (tabName == 'CSS') { textarea = document.getElementById('cssTxt'); }
+            if (tabName == 'JS') { textarea = document.getElementById('jsTxt'); }
+
+            const findText = document.getElementById('find-input').value;
+            const replaceText = document.getElementById('replace-input').value;
+            const isCaseSensitive = document.getElementById('case-sensitivity').checked;
+
+            if (findText !== '') {
+                // Set up regular expression with or without case sensitivity
+                const flags = isCaseSensitive ? 'g' : 'gi';  // 'g' for global, 'i' for case-insensitive
+                const regex = new RegExp(findText, flags);
+                
+                // Replace all occurrences of findText with replaceText
+                textarea.value = textarea.value.replace(regex, replaceText);
+                toggleModal(); // Close the modal after replacing
+            } else {
+                alert('Please enter text to find!');
+            }
         }
         
-        // window.onclick = function(event) {
-        //     const dropdowns = ['file', 'edit']
-        //     for (let i = 0; i < dropdowns.length; i++) {
-        //         closeDropdown(dropdowns[i])
-        //     }
-        // }
+        window.onclick = function(event) {
+            const modal = document.getElementById('farModal');
+            if (event.target === modal) {
+                toggleModal();
+            }
+
+            // const dropdowns = ['file', 'edit']
+            // for (let i = 0; i < dropdowns.length; i++) {
+            //     closeDropdown(dropdowns[i])
+            // }
+        }
 
         // function closeDropdown(type) {
         //     if (!event.target.matches('#' + type + 'NavBtn')) {
@@ -279,6 +382,259 @@
             });
         });
 
+////////////////////////////////////// Saving and Loading //////////////////////////////////////
+        let fileHandle; // Store the file handle for saving
+        let fileHandleHTML;
+        let fileHandleCSS;
+        let fileHandleJS;
+
+        async function openFile(type) {
+            // Show file picker to open a file
+            if (type === 'html') {
+                [fileHandle] = await window.showOpenFilePicker({
+                    types: [
+                        {
+                            description: "HTML Files",
+                            accept: { "text/html": [".html"] },
+                        },
+                    ],
+                });
+            }
+            if (type === 'css') {
+                [fileHandle] = await window.showOpenFilePicker({
+                    types: [
+                        {
+                            description: "CSS Files",
+                            accept: { "text/css": [".css"] },
+                        },
+                    ],
+                });
+                await loadCSS(fileHandle);
+                return;
+            }
+            if (type === 'js') {
+                [fileHandle] = await window.showOpenFilePicker({
+                    types: [
+                        {
+                            description: "JavaScript Files",
+                            accept: { "text/js": [".js"] },
+                        },
+                    ],
+                });
+                await loadJS(fileHandle);
+                return;
+            }
+
+            // Read and load file content
+            const file = await fileHandle.getFile();
+            const content = await file.text();
+
+            // Parse the HTML content using DOMParser
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, 'text/html');
+
+            // Handle <style> tags: Replace them with <link rel="stylesheet" href="styles.css">
+            const styleTags = doc.querySelectorAll('style');
+            styleTags.forEach(style => {
+                style.replaceWith('<link rel="stylesheet" href="styles.css">');
+            });
+
+            // Handle <script> tags: Replace them with <script src="script.js"><(dont put / here)script>
+            const scriptTags = doc.querySelectorAll('script');
+            scriptTags.forEach(script => {
+                let scriptContent = script.textContent.replace(/<\/script>/g, '<\\/script>');
+                script.replaceWith(atob("PHNjcmlwdCBzcmM9InNjcmlwdC5qcyI+PC9zY3JpcHQ+"));
+            });
+
+            // Get the final HTML string (modified)
+            const modifiedHTML = doc.documentElement.outerHTML;
+
+            // Set the modified HTML as the value of the textarea
+            // Encode the HTML content before inserting it to avoid escaping
+            document.getElementById("htmlTxt").value = modifiedHTML;
+
+            // Optionally, show the extracted styles and scripts in separate text areas (or whatever else you need)
+            document.getElementById("cssTxt").value = Array.from(styleTags).map(style => style.innerHTML).join('\n');
+            document.getElementById("jsTxt").value = Array.from(scriptTags).map(script => script.textContent).join('\n');
+        }
+
+        async function loadCSS(fileHandle) {
+            const file = await fileHandle.getFile();
+            const content = await file.text();
+
+            document.getElementById("cssTxt").value = content;
+        }
+
+        async function loadJS(fileHandle) {
+            const file = await fileHandle.getFile();
+            const content = await file.text();
+
+            document.getElementById("jsTxt").value = content;
+        }
+
+        // Function to handle encoding HTML (for the textarea)
+        function encodeHTML(html) {
+            const element = document.createElement('div');
+            if (html) {
+                element.innerText = html;
+                element.textContent = html;
+            }
+            return element.innerHTML;
+        }
+
+        async function saveFileAs() {
+            // Show save file picker to create or overwrite a file
+            [fileHandle] = await window.showSaveFilePicker({
+                suggestedName: "index.html",
+                types: [
+                    {
+                        description: "HTML Files",
+                        accept: { "text/html": [".html"] },
+                    },
+                ],
+            });
+
+            // Write content to the newly selected file
+            await saveToFile();
+        }
+
+        async function saveToFile() {
+            if (!fileHandle) {
+                // If no file is open, prompt to save as
+                await saveFileAs();
+                return;
+            }
+
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(compileDoc());
+            await writableStream.close();
+        }
+
+        async function saveFiles() {
+            if (!fileHandle) {
+                await saveFilesAs();
+                return;
+            }
+
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(compileDoc());
+            await writableStream.close
+        }
+
+        // Copy text to clipboard using Clipboard API
+        async function copyText() {
+            const textarea = document.getElementById('htmlTxt');
+            if (tabName == 'HTML') { textarea = document.getElementById('htmlTxt'); }
+            if (tabName == 'CSS') { textarea = document.getElementById('cssTxt'); }
+            if (tabName == 'JS') { textarea = document.getElementById('jsTxt'); }
+
+            try {
+                await navigator.clipboard.writeText(textarea.value);
+                alert('Text copied to clipboard!');
+            } catch (err) {
+                console.error('Error copying text: ', err);
+            }
+        }
+
+        // Paste text from clipboard into the textarea using Clipboard API
+        async function pasteText() {
+            const textarea = document.getElementById('htmlTxt');
+            if (tabName == 'HTML') { textarea = document.getElementById('htmlTxt'); }
+            if (tabName == 'CSS') { textarea = document.getElementById('cssTxt'); }
+            if (tabName == 'JS') { textarea = document.getElementById('jsTxt'); }
+
+            try {
+                const text = await navigator.clipboard.readText();
+                textarea.value = text; // Paste the clipboard text into the textarea
+            } catch (err) {
+                console.error('Error pasting text: ', err);
+            }
+        }
+
+        // For "cut", we can use a combination of copy and delete
+        async function cutText() {
+            const textarea = document.getElementById('htmlTxt');
+            if (tabName == 'HTML') { textarea = document.getElementById('htmlTxt'); }
+            if (tabName == 'CSS') { textarea = document.getElementById('cssTxt'); }
+            if (tabName == 'JS') { textarea = document.getElementById('jsTxt'); }
+
+            try {
+                await navigator.clipboard.writeText(textarea.value); // Copy the content to clipboard
+                textarea.value = ''; // Clear the textarea (cutting)
+                alert('Text cut and copied to clipboard!');
+            } catch (err) {
+                console.error('Error cutting text: ', err);
+            }
+        }
+
+        // Function to read a file and output its content to the corresponding textarea
+        function readFile(file, textareaId) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById(textareaId).value = e.target.result; // Set the content of the textarea
+            };
+            reader.readAsText(file); // Read the file as text
+        }
+
+        async function openFiles() {
+            try {
+                // Open folder picker
+                const directoryHandle = await window.showDirectoryPicker();
+
+                let cssFile, jsFile, htmlFile;
+
+                // Iterate over all files in the selected directory
+                for await (const entry of directoryHandle.values()) {
+                    const file = await entry.getFile();
+
+                    // Check file extension and assign to the correct variable
+                    if (file.name.endsWith('.css')) {
+                        cssFile = file;
+                    } else if (file.name.endsWith('.js')) {
+                        jsFile = file;
+                    } else if (file.name.endsWith('.html')) {
+                        htmlFile = file;
+                    }
+                }
+
+                // Read the contents of the files if they exist
+                if (cssFile) readFile(cssFile, 'cssTxt');
+                if (jsFile) readFile(jsFile, 'jsTxt');
+                if (htmlFile) readFile(htmlFile, 'htmlTxt');
+            } catch (error) {
+                console.error("Directory picker error:", error);
+            }
+        }
+
+        // Event listener for keyboard shortcuts
+        window.addEventListener("keydown", async (event) => {
+            // Ctrl + S: Save to current file or prompt Save As if no file is open
+            if (event.ctrlKey && event.key === "s" && !event.shiftKey) {
+                event.preventDefault(); // Prevent default browser save
+                await saveToFile();
+            }
+
+            // Ctrl + Shift + S: Always Save As
+            if (event.ctrlKey && event.shiftKey && event.key === "S") {
+                event.preventDefault(); // Prevent default browser behavior
+                await saveFileAs();
+            }
+
+            if (event.ctrlKey && event.shiftKey && event.key === "F") {
+                event.preventDefault(); // Prevent default browser behavior
+                await toggleModal();
+            }
+
+            if (event.ctrlKey && event.key === "d") {
+                event.preventDefault();
+                await createBlank();
+            }
+
+            if (event.ctrlKey && event.key === "o") {
+                event.preventDefault();
+                await openFiles();
+            }
+        });
     </script>
 </body>
 </html>

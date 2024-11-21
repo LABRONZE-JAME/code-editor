@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open and Save File</title>
+</head>
+<body>
+    <textarea id="textarea" rows="10" cols="50" placeholder="Open a file or type to create a new one..."></textarea>
+    <br>
+    <button id="openFile">Open File</button>
+    <p>Use <b>Ctrl + S</b> to save the file and <b>Ctrl + Shift + S</b> to always save as.</p>
+
+    <script>
+        let fileHandle; // Store the file handle for saving
+
+        async function openFile() {
+            // Show file picker to open a file
+            [fileHandle] = await window.showOpenFilePicker({
+                types: [
+                    {
+                        description: "Text Files",
+                        accept: { "text/plain": [".txt"] },
+                    },
+                ],
+            });
+
+            // Read and load file content
+            const file = await fileHandle.getFile();
+            const content = await file.text();
+            document.getElementById("textarea").value = content;
+        }
+
+        async function saveFileAs() {
+            // Show save file picker to create or overwrite a file
+            [fileHandle] = await window.showSaveFilePicker({
+                suggestedName: "untitled.txt",
+                types: [
+                    {
+                        description: "Text Files",
+                        accept: { "text/plain": [".txt"] },
+                    },
+                ],
+            });
+
+            // Write content to the newly selected file
+            await saveToFile();
+        }
+
+        async function saveToFile() {
+            if (!fileHandle) {
+                // If no file is open, prompt to save as
+                await saveFileAs();
+                return;
+            }
+
+            const textarea = document.getElementById("textarea");
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(textarea.value);
+            await writableStream.close();
+
+            alert("File saved successfully!");
+        }
+
+        // Event listener for opening a file
+        document.getElementById("openFile").addEventListener("click", openFile);
+
+        // Event listener for saving with keyboard shortcuts
+        window.addEventListener("keydown", async (event) => {
+            // Ctrl + S: Save to current file or prompt Save As if no file is open
+            if (event.ctrlKey && event.key === "s" && !event.shiftKey) {
+                event.preventDefault(); // Prevent default browser save
+                await saveToFile();
+            }
+
+            // Ctrl + Shift + S: Always Save As
+            if (event.ctrlKey && event.shiftKey && event.key === "S") {
+                event.preventDefault(); // Prevent default browser behavior
+                await saveFileAs();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Upload</title>
+</head>
+<body>
+
+<h2>Upload a Folder containing CSS, JS, and HTML Files</h2>
+
+<!-- Button to trigger folder picker -->
+<button id="open-folder-picker">Open Folder Picker</button>
+
+<!-- Textareas to display file contents -->
+<h3>CSS File</h3>
+<textarea id="css-content" rows="10" cols="50" readonly></textarea>
+
+<h3>JavaScript File</h3>
+<textarea id="js-content" rows="10" cols="50" readonly></textarea>
+
+<h3>HTML File</h3>
+<textarea id="html-content" rows="10" cols="50" readonly></textarea>
+
+<script>
+// Function to read a file and output its content to the corresponding textarea
+function readFile(file, textareaId) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+    document.getElementById(textareaId).value = e.target.result; // Set the content of the textarea
+    };
+    reader.readAsText(file); // Read the file as text
+}
+
+// Handle folder selection via showDirectoryPicker
+document.getElementById('open-folder-picker').addEventListener('click', async function() {
+    try {
+    // Open folder picker
+        const directoryHandle = await window.showDirectoryPicker();
+
+        let cssFile, jsFile, htmlFile;
+
+        // Iterate over all files in the selected directory
+        for await (const entry of directoryHandle.values()) {
+    const file = await entry.getFile();
+
+            // Check file extension and assign to the correct variable
+            if (file.name.endsWith('.css')) {
+    cssFile = file;
+            } else if (file.name.endsWith('.js')) {
+    jsFile = file;
+            } else if (file.name.endsWith('.html')) {
+    htmlFile = file;
+            }
+}
+
+        // Read the contents of the files if they exist
+        if (cssFile) readFile(cssFile, 'css-content');
+        if (jsFile) readFile(jsFile, 'js-content');
+        if (htmlFile) readFile(htmlFile, 'html-content');
+    } catch (error) {
+    console.error("Directory picker error:", error);
+    }
+});
+</script>
+
+</body>
+</html>

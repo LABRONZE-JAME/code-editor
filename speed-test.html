@@ -1,0 +1,80 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internet Speed Test</title>
+    <style>
+body {
+font-family: Arial, sans-serif;
+padding: 20px;
+background-color: #f7f7f7;
+}
+h1 {
+text-align: center;
+}
+.test-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+.test-button {
+padding: 10px 20px;
+font-size: 16px;
+cursor: pointer;
+margin: 20px 0;
+background-color: #4CAF50;
+color: white;
+border: none;
+border-radius: 5px;
+}
+.test-button:hover {
+background-color: #45a049;
+}
+.result {
+margin-top: 20px;
+font-size: 18px;
+}
+
+
+</style>
+</head>
+<body>
+    <h1>Internet Speed Test</h1>
+    <div class="test-container">
+        <button class="test-button" id="startTest">Start Speed Test</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+document.getElementById('startTest').addEventListener('click', function () {
+const resultElement = document.getElementById('result');
+resultElement.innerHTML = 'Testing... Please wait.';
+
+// Start measuring time
+const startTime = Date.now();
+
+// Load a file (replace with an actual large file URL for better testing)
+const testFileUrl = 'https://raw.githubusercontent.com/Dynomines/subway-surfers-unity/refs/heads/main/subway-surfers-unity/Build/Miami/subway_miami_v1.data.unityweb'; // A sample file for testing
+
+const xhr = new XMLHttpRequest();
+xhr.open('GET', testFileUrl, true);
+xhr.responseType = 'blob';
+
+xhr.onload = function () {
+const endTime = Date.now();
+const duration = (endTime - startTime) / 1000; // Time in seconds
+const fileSize = xhr.response.size / 1024 / 1024; // Size in MB
+const speed = (fileSize / duration).toFixed(2); // Speed in MB/s
+
+resultElement.innerHTML = `Download Speed: ${speed} MB/s (Duration: ${duration.toFixed(2)} seconds, File size: ${fileSize.toFixed(2)} MB)`;
+};
+
+xhr.onerror = function () {
+resultElement.innerHTML = 'Error during the test. Please try again.';
+};
+
+xhr.send();
+});
+
+</script>
+
+</body></html>
