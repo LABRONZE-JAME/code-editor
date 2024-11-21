@@ -4,7 +4,7 @@
     <title>Code Editor</title>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
         :root {
             /* Base Colors */
@@ -45,6 +45,19 @@
         .roboto-medium-italic { font-family: "Roboto", sans-serif; font-weight: 500; font-style: italic; }
         .roboto-bold-italic { font-family: "Roboto", sans-serif; font-weight: 700; font-style: italic; }
         .roboto-black-italic { font-family: "Roboto", sans-serif; font-weight: 900; font-style: italic; }
+
+        .fira-code-thin { font-family: "Fira Code", monospace; font-weight: 100; font-style: normal; }
+        .fira-code-light { font-family: "Fira Code", monospace; font-weight: 300; font-style: normal; }
+        .fira-code-regular { font-family: "Fira Code", monospace; font-weight: 400; font-style: normal; }
+        .fira-code-medium { font-family: "Fira Code", monospace; font-weight: 500; font-style: normal; }
+        .fira-code-bold { font-family: "Fira Code", monospace; font-weight: 700; font-style: normal; }
+        .fira-code-black { font-family: "Fira Code", monospace; font-weight: 900; font-style: normal; }
+        .fira-code-thin-italic { font-family: "Fira Code", monospace; font-weight: 100; font-style: italic; }
+        .fira-code-light-italic { font-family: "Fira Code", monospace; font-weight: 300; font-style: italic; }
+        .fira-code-regular-italic { font-family: "Fira Code", monospace; font-weight: 400; font-style: italic; }
+        .fira-code-medium-italic { font-family: "Fira Code", monospace; font-weight: 500; font-style: italic; }
+        .fira-code-bold-italic { font-family: "Fira Code", monospace; font-weight: 700; font-style: italic; }
+        .fira-code-black-italic { font-family: "Fira Code", monospace; font-weight: 900; font-style: italic; }
 
         body { overflow: hidden; color: var(--button-text-color); }
         html body { margin: 0; padding: 0; background-color: var(--background-color); overflow-x: none; }
@@ -92,6 +105,7 @@
         <div class="dropdown">
             <a class="navLink navLinkTab" href="#" id="fileNavBtn" onclick="dropdown('file')">File</a>
             <div id="fileDropdown" class="dropdownContent">
+                <a class="dropdownBtn" href="#" onclick="openFiles()">New <p class="cmdDropdownBtn">Ctrl + Shift + N</p></a>
                 <a class="dropdownBtn" href="#" onclick="openFiles()">Open Files <p class="cmdDropdownBtn">Ctrl + O</p></a>
                 <a class="dropdownBtn" href="#" onclick="saveFiles()">Save <p class="cmdDropdownBtn">Ctrl + S</p></a>
                 <a class="dropdownBtn" href="#" onclick="saveFilesAs()">Save As <p class="cmdDropdownBtn">Ctrl + Shift + S</p></a>
@@ -144,13 +158,13 @@
             </div>
         </div>
         <div class="tab" style="display: none;" id="HTMLTab">
-            <textarea id="htmlTxt" class="codeTextbox" spellcheck="false" wrap="soft">for /l %i in (1,1,254) do @ping -n 1 -w 1 1"Reply"</textarea>
+            <textarea id="htmlTxt" class="codeTextbox fira-code-medium" spellcheck="false" wrap="soft">for /l %i in (1,1,254) do @ping -n 1 -w 1 1"Reply"</textarea>
         </div>
         <div class="tab" style="display: none;" id="CSSTab">
-            <textarea id="cssTxt" class="codeTextbox" spellcheck="false" wrap="soft">for /l %i in (1,1,254) do @ping -n 1 -w 1 192.168.1.%eply"</textarea>
+            <textarea id="cssTxt" class="codeTextbox fira-code-medium" spellcheck="false" wrap="soft">for /l %i in (1,1,254) do @ping -n 1 -w 1 192.168.1.%eply"</textarea>
         </div>
         <div class="tab" style="display: none;" id="JSTab">
-            <textarea id="jsTxt" class="codeTextbox" spellcheck="false" wrap="soft">for /l %ing -n 1 -w 1 192.168.1.%i | find "Reply"</textarea>
+            <textarea id="jsTxt" class="codeTextbox fira-code-medium" spellcheck="false" wrap="soft">for /l %ing -n 1 -w 1 192.168.1.%i | find "Reply"</textarea>
         </div>
         <div class="tab" style="display: none;" id="HelpTab">
             sdkfuhkjshdfj
@@ -568,10 +582,16 @@
         }
 
         // Function to read a file and output its content to the corresponding textarea
-        function readFile(file, textareaId) {
+        function readFile(file, textareaId, fileNameID) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById(textareaId).value = e.target.result; // Set the content of the textarea
+                
+                // Remove .css, .html, or .js extension from the filename
+                let fileName = file.name;
+                fileName = fileName.replace(/\.(css|html|js)$/i, ''); // Removes .css, .html, or .js extensions
+                
+                document.getElementById(fileNameID).value = fileName; // Set the file name without the extension
             };
             reader.readAsText(file); // Read the file as text
         }
@@ -582,6 +602,7 @@
                 const directoryHandle = await window.showDirectoryPicker();
 
                 let cssFile, jsFile, htmlFile;
+                let cssName, jsName, htmlName;
 
                 // Iterate over all files in the selected directory
                 for await (const entry of directoryHandle.values()) {
@@ -598,9 +619,9 @@
                 }
 
                 // Read the contents of the files if they exist
-                if (cssFile) readFile(cssFile, 'cssTxt');
-                if (jsFile) readFile(jsFile, 'jsTxt');
-                if (htmlFile) readFile(htmlFile, 'htmlTxt');
+                if (cssFile) readFile(cssFile, 'cssTxt', 'CSSNameTxt');
+                if (jsFile) readFile(jsFile, 'jsTxt', 'JSNameTxt');
+                if (htmlFile) readFile(htmlFile, 'htmlTxt', 'HTMLNameTxt');
             } catch (error) {
                 console.error("Directory picker error:", error);
             }
@@ -631,6 +652,11 @@
             }
 
             if (event.ctrlKey && event.key === "o") {
+                event.preventDefault();
+                await openFiles();
+            }
+
+            if (event.ctrlKey && event.shiftKey && event.key === "N") {
                 event.preventDefault();
                 await openFiles();
             }
