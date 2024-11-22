@@ -90,13 +90,15 @@
         #nameTxt { display: none; }
 
         .modal { position: fixed; z-index: 2; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); padding-top: 60px; display: block; }
-        .modal-content { background-color: white; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 300px; }
-        .modal-content > .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .modal-content { background-color: var(--background-color); margin: 5% auto; padding: 20px; border: 1px solid var(--dark-gray); width: 300px; border-radius: 5px; }
+        .modal-content > .close { color: var(--button-color); float: right; font-size: 28px; font-weight: bold; }
         .modal-content > .close:hover,
-        .modal-content > .close:focus { color: black; text-decoration: none; cursor: pointer; }
-        .modal-content > input { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; }
-        .modal-content > button { padding: 8px 16px; margin-top: 10px; cursor: pointer; }
+        .modal-content > .close:focus { color: var(--navbar-text-color); text-decoration: none; cursor: pointer; }
+        .modal-content > input { width: 100%; padding: 8px; margin: 8px 0; box-sizing: border-box; color: var(--navbar-text-color); background-color: var(--background-color); border: 0; }
+        .modal-content > input:focus { outline: 2px solid var(--navbar-border-color); border-radius: 5px; }
+        .modal-content > button { padding: 8px 16px; margin-top: 10px; cursor: pointer;  }
         .modal-content > label { display: block; margin-top: 10px; }
+        .modal-content > h4 { color: var(--navbar-text-color); }
     </style>
 </head>
 <body class="roboto-regular">
@@ -105,7 +107,7 @@
         <div class="dropdown">
             <a class="navLink navLinkTab" href="#" id="fileNavBtn" onclick="dropdown('file')">File</a>
             <div id="fileDropdown" class="dropdownContent">
-                <a class="dropdownBtn" href="#" onclick="openFiles()">New <p class="cmdDropdownBtn">Ctrl + Shift + N</p></a>
+                <a class="dropdownBtn" href="#" onclick="newDoc(); dropdown('file')">New <p class="cmdDropdownBtn">Ctrl + Shift + N</p></a>
                 <a class="dropdownBtn" href="#" onclick="openFiles()">Open Files <p class="cmdDropdownBtn">Ctrl + O</p></a>
                 <a class="dropdownBtn" href="#" onclick="saveFiles()">Save <p class="cmdDropdownBtn">Ctrl + S</p></a>
                 <a class="dropdownBtn" href="#" onclick="saveFilesAs()">Save As <p class="cmdDropdownBtn">Ctrl + Shift + S</p></a>
@@ -153,7 +155,7 @@
                 <h2>Code Editor</h2>
                 <ul>
                     <a href="#" class="newTabBtn" onclick="tabName('HTML')">New File</a>
-                    <a href="#" class="newTabBtn" onclick="alert('WIP')">Open Folder</a>
+                    <a href="#" class="newTabBtn" onclick="openFiles(); tabName('HTML')">Open Folder</a>
                 </ul>
             </div>
         </div>
@@ -196,12 +198,9 @@
 
         let currentTab = 'new';
 
-        document.getElementById("htmlTxt").value = atob("PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8bWV0YSBodHRwLWVxdWl2PSJYLVVBLUNvbXBhdGlibGUiIGNvbnRlbnQ9ImllPWVkZ2UiPgogICAgPHRpdGxlPkhUTUwgVGVtcGxhdGU8L3RpdGxlPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBDU1MgLS0+CiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9InN0eWxlcy5jc3MiPgoKPC9oZWFkPgo8Ym9keT4KCiAgICA8IS0tIENvbnRlbnQgZ29lcyBoZXJlIC0tPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBKYXZhU2NyaXB0IC0tPgogICAgPHNjcmlwdCBzcmM9InNjcmlwdC5qcyI+PC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPg==")
-        document.getElementById("HTMLNameTxt").value = "index";
-        document.getElementById("CSSNameTxt").value = "styles";
-        document.getElementById("JSNameTxt").value = "script";
+        
 
-        tabName('new')
+        newDoc();
 
         function tabName(tabName) {
             currentTab = tabName;
@@ -223,6 +222,16 @@
                 document.getElementById(tabName + "Tab").style.display = "block";
                 chgTitle(tabName)
             };
+        }
+
+        function newDoc() {
+            tabName('new')
+            document.getElementById("htmlTxt").value = atob("PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8bWV0YSBodHRwLWVxdWl2PSJYLVVBLUNvbXBhdGlibGUiIGNvbnRlbnQ9ImllPWVkZ2UiPgogICAgPHRpdGxlPkhUTUwgVGVtcGxhdGU8L3RpdGxlPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBDU1MgLS0+CiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9InN0eWxlcy5jc3MiPgoKPC9oZWFkPgo8Ym9keT4KCiAgICA8IS0tIENvbnRlbnQgZ29lcyBoZXJlIC0tPgoKICAgIDwhLS0gTGluayB0byBleHRlcm5hbCBKYXZhU2NyaXB0IC0tPgogICAgPHNjcmlwdCBzcmM9InNjcmlwdC5qcyI+PC9zY3JpcHQ+CjwvYm9keT4KPC9odG1sPg==")
+            document.getElementById("cssTxt").value = atob("aHRtbCBib2R5IHsKICAgIG1hcmdpbjogMDsKfQ==")
+            document.getElementById("jsTxt").value = atob("d2luZG93LmFkZEV2ZW50TGlzdGVuZXIoImtleWRvd24iLCBhc3luYyAoZXZlbnQpID0+IHsKICAgIGlmIChldmVudC5rZXkgPT09ICJzIikgewogICAgCWV2ZW50LnByZXZlbnREZWZhdWx0KCk7CglhbGVydCgiWW91IHByZXNzZWQgLT4gcyEhISEhIik7Cn19KTs=")
+            document.getElementById("HTMLNameTxt").value = "index";
+            document.getElementById("CSSNameTxt").value = "styles";
+            document.getElementById("JSNameTxt").value = "script";
         }
 
         function hideTabs() {
@@ -301,6 +310,7 @@
             var d = document.getElementById(from + "Dropdown");
             let x_pos = event.ClientX
             let y_pos = event.ClientY
+
             d.style.position = "absolute";
             d.style.left = x_pos+'px';
             d.style.top = y_pos+'px';
@@ -390,11 +400,88 @@
 
         // Loop through all textarea elements and add event listener for keydown
         textareas.forEach(function(textarea) {
-            textarea.addEventListener('input', function() {
-            // Call the auto-indent function whenever the user types
-            autoIndentTextarea(textarea);
+            textarea.addEventListener('keydown', function(event) {
+                // Call the auto-indent function whenever the user types
+                autoIndentTextarea(textarea);
+                
+                // Call the bracket completion function
+                autoCompleteBrackets(textarea, event);
             });
         });
+
+        // Function to automatically complete brackets and similar pairs
+        function autoCompleteBrackets(textarea, event) {
+            const char = event.key; // Get the character that was pressed
+            const cursorPos = textarea.selectionStart; // The current position of the cursor
+            const value = textarea.value; // The current value of the textarea
+            const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd); // The highlighted text (if any)
+
+            // Define matching pairs of brackets and quotes
+            const pairs = {
+                '(': ')',
+                '{': '}',
+                '[': ']',
+                '"': '"',
+                "'": "'"
+            };
+
+            // If the user presses an opening bracket, automatically insert the closing bracket
+            if (pairs[char]) {
+                event.preventDefault(); // Prevent the default input of the character
+
+                // If there's selected text, wrap it with brackets
+                if (selectedText) {
+                    // Insert the opening and closing brackets around the selected text
+                    textarea.value = value.substring(0, cursorPos) + char + selectedText + pairs[char] + value.substring(textarea.selectionEnd);
+                    // Move the cursor to the position after the inserted closing bracket
+                    textarea.selectionStart = textarea.selectionEnd = cursorPos + char.length + selectedText.length + pairs[char].length;
+                } else {
+                    // Otherwise, just insert the opening bracket and the closing bracket after it
+                    textarea.value = value.substring(0, cursorPos) + char + pairs[char] + value.substring(cursorPos);
+                    // Move the cursor between the two inserted brackets
+                    textarea.selectionStart = textarea.selectionEnd = cursorPos + char.length;
+                }
+            }
+
+            // If the user presses a closing bracket, handle it
+            const closingBrackets = Object.values(pairs);
+            if (closingBrackets.includes(char)) {
+                // Check if the character typed is a closing bracket
+                const matchingOpeningChar = getMatchingOpeningBracket(value, cursorPos, char);
+                if (matchingOpeningChar) {
+                    // If the character is part of a valid pair, let it be typed as normal
+                    return;
+                }
+            }
+        }
+
+        // Function to get the matching opening bracket for a given closing bracket
+        function getMatchingOpeningBracket(value, cursorPos, closingChar) {
+            const openingChars = ['(', '{', '[', '"', "'"];
+            const closingChars = [')', '}', ']', '"', "'"];
+            
+            // Find the index of the closing bracket
+            const closingIndex = closingChars.indexOf(closingChar);
+            const matchingOpeningChar = openingChars[closingIndex];
+
+            let stack = [];
+            // Loop through the text from the cursor position backwards to find a matching opening bracket
+            for (let i = cursorPos - 1; i >= 0; i--) {
+                const char = value[i];
+                
+                if (char === matchingOpeningChar) {
+                    if (stack.length === 0) {
+                        return matchingOpeningChar;  // Found the matching opening bracket
+                    }
+                    stack.pop();  // Unmatched opening bracket found, so pop from the stack
+                }
+                
+                if (closingChars.includes(char)) {
+                    stack.push(char);  // Push closing brackets onto the stack
+                }
+            }
+            return null;  // No matching opening bracket found
+        }
 
 ////////////////////////////////////// Saving and Loading //////////////////////////////////////
         let fileHandle; // Store the file handle for saving
@@ -629,33 +716,37 @@
 
         // Event listener for keyboard shortcuts
         window.addEventListener("keydown", async (event) => {
-            // Ctrl + S: Save to current file or prompt Save As if no file is open
+            // Ctrl + S: Save To File
             if (event.ctrlKey && event.key === "s" && !event.shiftKey) {
-                event.preventDefault(); // Prevent default browser save
+                event.preventDefault();
                 await saveToFile();
             }
 
-            // Ctrl + Shift + S: Always Save As
+            // Ctrl + Shift + S: Save As
             if (event.ctrlKey && event.shiftKey && event.key === "S") {
-                event.preventDefault(); // Prevent default browser behavior
+                event.preventDefault();
                 await saveFileAs();
             }
 
+            // Ctrl + Shift + F: Find And Replace
             if (event.ctrlKey && event.shiftKey && event.key === "F") {
-                event.preventDefault(); // Prevent default browser behavior
+                event.preventDefault();
                 await toggleModal();
             }
 
+            // Ctrl + D: Open In New Tab
             if (event.ctrlKey && event.key === "d") {
                 event.preventDefault();
                 await createBlank();
             }
 
+            // Ctrl + O: Open Folder
             if (event.ctrlKey && event.key === "o") {
                 event.preventDefault();
                 await openFiles();
             }
 
+            // Ctrl + Shift + N: New Project
             if (event.ctrlKey && event.shiftKey && event.key === "N") {
                 event.preventDefault();
                 await openFiles();
