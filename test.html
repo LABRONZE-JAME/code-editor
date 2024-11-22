@@ -157,6 +157,7 @@
                 <ul>
                     <a href="#" class="newTabBtn" onclick="tabName('HTML')">New File</a>
                     <a href="#" class="newTabBtn" onclick="openFiles(); tabName('HTML')">Open Folder</a>
+                    <a href="#" class="newTabBtn" onclick="downloadHTML()"> Download site for offline use</a>
                 </ul>
             </div>
         </div>
@@ -283,6 +284,27 @@
             iframe.style.margin = '0';
             iframe.srcdoc = code;
             win.document.body.appendChild(iframe);
+        }
+
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML; // Get the entire HTML of the page
+            
+            // Get the current date in YYYY-MM-DD format
+            const date = new Date();
+            const dateString = date.toISOString().split('T')[0]; // Format date as "YYYY-MM-DD"
+            
+            // Create a Blob from the HTML content
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            
+            // Create an anchor element
+            const link = document.createElement('a');
+            
+            // Set the download filename with the date
+            link.href = URL.createObjectURL(blob);
+            link.download = `code-editor_${dateString}.html`; // Use the date in the filename
+            
+            // Trigger the download by simulating a click
+            link.click();
         }
 
         function saveOneFile() {
